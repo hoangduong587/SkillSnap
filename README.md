@@ -47,12 +47,13 @@ EF Core migrations for schema management
 Simplified relational model (no navigation properties)
 
 🏗️ Architecture Overview
-Code
+
 SkillSnap/
-│── SkillSnap.Api/        → ASP.NET Core Web API
-│── SkillSnap.Client/     → Blazor WebAssembly frontend
-│── SkillSnap.Shared/     → Shared DTOs and models
-│── SkillSnap.sln         → Solution file
+│── SkillSnap.Api/
+│── SkillSnap.Client/
+│── SkillSnap.Shared/
+│── SkillSnap.sln
+
 Backend
 ASP.NET Core Web API
 
