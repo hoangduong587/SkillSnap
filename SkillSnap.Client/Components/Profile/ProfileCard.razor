@@ -1,0 +1,28 @@
+@using SkillSnap.Client.Services
+@using SkillSnap.Shared
+@inject ProfileService ProfileService
+
+<div class="profile-card">
+    @if (profile == null)
+    {
+        <p>Loading profile...</p>
+    }
+    else
+    {
+        <img src="@profile.ProfilePictureUrl" alt="@profile.Name" class="profile-image" />
+
+        <div class="profile-info">
+            <h2>@profile.Name</h2>
+            <p>@profile.Bio</p>
+        </div>
+    }
+</div>
+
+@code {
+    private PortfolioUserDto? profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await ProfileService.GetProfileAsync();
+    }
+}

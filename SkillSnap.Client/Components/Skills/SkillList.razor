@@ -1,0 +1,72 @@
+@page "/skills"
+@using SkillSnap.Client.Services
+@using SkillSnap.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject SkillService SkillService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<h3>Add Skill</h3>
+
+<div class="add-skill-form">
+    <input @bind="newSkill.Name" placeholder="Skill name" />
+    <input @bind="newSkill.Level" placeholder="Skill level" />
+    <button @onclick="AddSkill">Add</button>
+</div>
+
+<hr />
+
+<div class="skill-list">
+    @if (skills == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!skills.Any())
+    {
+        <p>No skills available.</p>
+    }
+    else
+    {
+        @foreach (var skill in skills)
+        {
+            <SkillTags Name="@skill.Name" Level="@skill.Level" />
+        }
+    }
+</div>
+
+@code {
+    private List<SkillDto>? skills;
+    private SkillDto newSkill = new SkillDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Wait for authentication to complete
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            skills = await SkillService.GetSkillsAsync();
+        }
+        else
+        {
+            skills = new List<SkillDto>(); // empty list for unauthenticated users
+        }
+    }
+
+    private async Task AddSkill()
+    {
+        if (string.IsNullOrWhiteSpace(newSkill.Name) ||
+            string.IsNullOrWhiteSpace(newSkill.Level))
+            return;
+
+        // No need to set PortfolioUserId — server sets it automatically
+        var created = await SkillService.AddSkillAsync(newSkill);
+
+        if (created != null)
+        {
+            skills!.Add(created);
+            newSkill = new SkillDto(); // reset form
+        }
+    }
+}

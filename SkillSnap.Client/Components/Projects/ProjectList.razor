@@ -1,0 +1,77 @@
+@page "/projects"
+
+@using SkillSnap.Client.Services
+@using SkillSnap.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject ProjectService ProjectService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<h3>Add Project</h3>
+
+<div class="add-project-form">
+    <input @bind="newProject.Title" placeholder="Project title" />
+    <input @bind="newProject.Description" placeholder="Project description" />
+    <input @bind="newProject.ImageUrl" placeholder="Image URL" />
+    <button @onclick="AddProject">Add</button>
+</div>
+
+<hr />
+
+<div class="project-list">
+    @if (projects == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!projects.Any())
+    {
+        <p>No projects available.</p>
+    }
+    else
+    {
+        @foreach (var project in projects)
+        {
+            <ProjectTags 
+                Title="@project.Title"
+                Description="@project.Description"
+                ImageUrl="@project.ImageUrl" />
+        }
+    }
+</div>
+
+@code {
+    private List<ProjectDto>? projects;
+    private ProjectDto newProject = new ProjectDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Wait for authentication to complete
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            projects = await ProjectService.GetProjectsAsync();
+        }
+        else
+        {
+            projects = new List<ProjectDto>(); // empty list for unauthenticated users
+        }
+    }
+
+    private async Task AddProject()
+    {
+        if (string.IsNullOrWhiteSpace(newProject.Title) ||
+            string.IsNullOrWhiteSpace(newProject.Description))
+            return;
+
+        // Do NOT set PortfolioUserId — server assigns it automatically
+        var created = await ProjectService.AddProjectAsync(newProject);
+
+        if (created != null)
+        {
+            projects!.Add(created);
+            newProject = new ProjectDto(); // reset form
+        }
+    }
+}
