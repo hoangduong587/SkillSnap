@@ -47,13 +47,13 @@ EF Core migrations for schema management
 Simplified relational model (no navigation properties)
 
 🏗️ Architecture Overview
-
+```
 SkillSnap/
 │── SkillSnap.Api/
 │── SkillSnap.Client/
 │── SkillSnap.Shared/
 │── SkillSnap.sln
-
+```
 Backend
 ASP.NET Core Web API
 
